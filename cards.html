@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narrative Challenge Deck</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #1c1c1c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      color: #f5c242;
+      text-shadow: 1px 1px 4px #000;
+    }
+
+    .deck-container {
+      display: flex;
+      gap: 20px;
+      perspective: 1000px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      width: 200px;
+      height: 280px;
+      background: #333;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px;
+      background-size: 100% 100%;
+      background-position: top left; 
+      background-repeat: no-repeat;
+    }
+
+    .card-face .card-text {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      text-align: center;
+      color: inherit;
+      font-size: inherit;
+      pointer-events: none;
+    }
+
+    .card-back .card-text {
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      text-align: center;
+      color: #000000;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .card-front {
+      background: #444;
+      color: #f5f5f5;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .card-back {
+      background: #222;
+      color: #000000;
+      transform: rotateY(180deg);
+      font-size: 1rem;
+    }
+
+    .haunted-glow {
+      box-shadow: 0 0 20px 5px #ff00ff inset, 0 0 20px 5px #ff00ff;
+      border: 2px solid #ff00ff;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #4cafef;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #42a5f5;
+    }
+  </style>
+</head>
+<body>
+  <h1>Draw. Fight. Repeat.</h1>
+  <div class="deck-container" id="deckContainer"></div>
+  <div>
+    <button onclick="shuffleDeck()">Shuffle Deck</button>
+  </div>
+
+  <script>
+    const cards = [
+      "Staff bashes only.", //THE MONK
+      "No armour, only high-damage weapons.", //THE BERSERKER
+      "Only use items you pick up during the challenge.", //THE SCAVENGER
+      "Every time you eat, drop a random item.", //THE CURSED ONE
+      "Must wear full metal armour. Never retreat.", //THE KNIGHT
+      "Always use the strongest weapon in your inventory.", //THE ASSASSIN
+      "Only combat spells allowed.", //THE WARLOCK
+      "Max damage gear but no food allowed.", //THE GLASS CANNON
+      "Re-flip this slot every 10 minutes.", //THE HAUNTED
+      "Wear at least one ridiculous cosmetic item while fighting.", //THE JESTER
+      "You may only fight monsters 1:1 — no multi-combat zones.", //THE DUELIST
+      "You must finish each kill with a ranged or thrown weapon.", //THE HUNTER
+      "No magic, no ranged — melee only.", //THE SILENCE
+      "You can only heal using lifesteal effects.", //THE VAMPIRE
+      "No banking until the task is done.", //THE BANKER
+      "You can only eat food that you cook or gather yourself during the run.", //THE FORAGER
+      "You must keep every item you come across — no dropping allowed.", //THE HOARDER
+      "Spend no more than 1,000 coins on supplies.", //THE BEGGAR
+      "If this is your first card, you can only buy gear. If not, you can only buy food.", //THE GAMBLER
+      "You must drink in-game alcohol after every kill.", //THE DRUNKARD
+      "You must travel on foot only. No teleports.", //THE PILGRIM
+      "Every kill, you must swap to a new weapon.", //THE SWITCHEROO
+      "Your most valuable drop goes to your opponent at the end.", //THE UNLUCKY ONE,
+      "Regularly message your opponent compliments.", //THE LOVER
+      "You must always eat up to max health.", //THE GLUTTON
+      "You cannot heal above 50% health.", //THE FRAGILE
+      "You must equip a light source all the time.", //THE MOTH
+      "Monsters must attack you first.", //THE PACIFIST
+      "You cannot pickup monster drops", //THE BLIND
+      "Use the opposite combat style to a monster's weakness", //THE REVERSER
+      "You cannot return to a place you've been.", //THE NOMAD
+      "Copy the attack style of the monster you're fighting", //THE MIMIC
+      "You must emote at the end of every kill", //THE EMOTER
+      "1hp. Full Dharok. You know the drill." //THE DHAROKER
+
+
+
+    ];
+
+    const cardFrontImages = {
+      0: 'images/monk.png', 
+      1: 'images/berserker.png', 
+      2: 'images/scavenger.png',
+      3: 'images/cursed.png', 
+      4: 'images/knight.png', 
+      5: 'images/assassin.png',
+      6: 'images/warlock.png', 
+      7: 'images/glasscannon.png', 
+      8: 'images/haunted.png',
+      9: 'images/jester.png', 
+      10: 'images/duelist.png', 
+      11: 'images/hunter.png',
+      12: 'images/silence.png', 
+      13: 'images/vampire.png', 
+      14: 'images/banker.png',
+      15: 'images/forager.png', 
+      16: 'images/hoarder.png', 
+      17: 'images/beggar.png',
+      18: 'images/gambler.png', 
+      19: 'images/drunkard.png', 
+      20: 'images/pilgrim.png',
+      21: 'images/switcheroo.png', 
+      22: 'images/unlucky.png',
+      23: 'images/lover.png',
+      24: 'images/glutton.png',
+      25: 'images/fragile.png',
+      26: 'images/moth.png',
+      27: 'images/pacifist.png',
+      28: 'images/blind.png',
+      29: 'images/reverser.png',
+      30: 'images/nomad.png',
+      31: 'images/mimic.png',
+      32: 'images/emoter.png',
+      33: 'images/dharoker.png'
+    };
+
+    const deckContainer = document.getElementById('deckContainer');
+    let currentDeck = [];
+
+    const cardBackImage = 'images/back.png';
+
+    function createCardElement(cardValue, slotIndex) {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'card';
+      cardEl.dataset.hauntedLocked = "false"; // NEW: lock flag
+
+      // FRONT
+      const front = document.createElement('div');
+      front.className = 'card-face card-front';
+      front.style.backgroundImage = `url('${cardBackImage}')`;
+      const frontText = document.createElement('div');
+      frontText.className = 'card-text';
+      frontText.textContent = "Click to reveal";
+      front.appendChild(frontText);
+
+      // BACK
+      const back = document.createElement('div');
+      back.className = 'card-face card-back';
+      const cardIndex = cards.indexOf(cardValue);
+      if (cardFrontImages[cardIndex] !== undefined) {
+        back.style.backgroundImage = `url('${cardFrontImages[cardIndex]}')`;
+      }
+      const backText = document.createElement('div');
+      backText.className = 'card-text';
+      backText.textContent = cardValue;
+      back.appendChild(backText);
+
+      // Haunted badge
+      const hauntedBadge = document.createElement('div');
+      hauntedBadge.style.position = 'absolute';
+      hauntedBadge.style.top = '5px';
+      hauntedBadge.style.right = '5px';
+      hauntedBadge.style.width = '20px';
+      hauntedBadge.style.height = '20px';
+      hauntedBadge.style.borderRadius = '50%';
+      hauntedBadge.style.background = '#ff00ff';
+      hauntedBadge.style.display = 'none';
+      cardEl.appendChild(hauntedBadge);
+
+      cardEl.appendChild(front);
+      cardEl.appendChild(back);
+
+      // CLICK HANDLER
+      cardEl.addEventListener('click', () => {
+        if (!cardEl.classList.contains('flipped')) {
+          cardEl.classList.add('flipped');
+
+          if (cardValue.includes("The Haunted") || cardValue.includes("Re-flip this slot")) {
+            hauntedBadge.style.display = "block";
+            cardEl.classList.add('haunted-glow');
+            cardEl.dataset.haunted = "true"; // mark as Haunted revealed
+            if (cardValue.includes("The Haunted")) {
+              cardEl.dataset.hauntedLocked = "true"; // lock this slot
+            }
+          }
+
+        } else {
+          cardEl.classList.remove('flipped');
+
+          if (hauntedBadge.style.display === "block") {
+            setTimeout(() => {
+              const faceUpCards = Array.from(deckContainer.querySelectorAll('.card.flipped .card-text')).map(el => el.textContent);
+
+              const availableCards = cards.filter(c => 
+                !faceUpCards.includes(c) && 
+                !(cardEl.dataset.hauntedLocked === "true" && c.includes("The Haunted"))
+              );
+
+              if (availableCards.length === 0) return;
+
+              let newCard;
+              do {
+                newCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+              } while (newCard === cardValue);
+
+              cardValue = newCard;
+              backText.textContent = cardValue;
+
+              const newCardIndex = cards.indexOf(cardValue);
+              if (cardFrontImages[newCardIndex] !== undefined) {
+                back.style.backgroundImage = `url('${cardFrontImages[newCardIndex]}')`;
+              }
+
+              currentDeck[slotIndex] = cardValue;
+            }, 600);
+          }
+        }
+      });
+
+      return cardEl;
+    }
+
+    function renderDeck(deckArray) {
+      deckContainer.innerHTML = '';
+      currentDeck = [...deckArray];
+      deckArray.forEach((cardText, index) => {
+        const cardEl = createCardElement(cardText, index);
+        deckContainer.appendChild(cardEl);
+      });
+    }
+
+    function shuffleDeck() {
+      const shuffled = [...cards].sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, 5);
+      renderDeck(selected);
+    }
+
+    shuffleDeck();
+  </script>
+</body>
+</html>
