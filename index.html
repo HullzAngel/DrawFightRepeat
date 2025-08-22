@@ -5,9 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Narrative Challenge Deck</title>
   <style>
+
+    @font-face {
+      font-family: 'OSRSFont';
+      src: url('fonts/osrs.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+    
     body {
       margin: 0;
-      font-family: 'Arial', sans-serif;
+      font-family: 'OSRSFont';
       background: #1c1c1c;
       color: #fff;
       display: flex;
@@ -18,8 +26,8 @@
     }
 
     h1 {
-      margin-bottom: 30px;
-      font-size: 2.2rem;
+      margin-bottom: 0px;
+      font-size: 7rem;
       color: #f5c242;
       text-shadow: 1px 1px 4px #000;
     }
@@ -28,7 +36,7 @@
       display: flex;
       gap: 20px;
       perspective: 1000px;
-      margin-bottom: 30px;
+      margin-bottom: 0px;
     }
 
     .card {
@@ -107,15 +115,33 @@
 
     .haunted-glow {
       box-shadow: 0 0 20px 5px #ff00ff inset, 0 0 20px 5px #ff00ff;
-      border: 2px solid #ff00ff;
+      border: 0px solid #ff00ff;
+    }
+
+    .mystical-text {
+      font-style: italic;
+      text-align: center;
+      color: #ffffff; /* base color */
+      font-size: 1.6rem; /* or 20px, 24px, etc. */
+      margin-bottom: 60px;
+
+    }
+    .deck-message {
+      font-family: 'OSRSFont', Arial, sans-serif; /* match page font */
+      font-size: 2rem;
+      color: #ffffff;
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 60px;
     }
 
     button {
+      font-family: 'OSRSFont';
       padding: 12px 24px;
-      font-size: 18px;
+      font-size: 24px;
       border: none;
       border-radius: 8px;
-      background: #4cafef;
+      background: #f5c242;
       color: #fff;
       cursor: pointer;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -123,13 +149,16 @@
     }
 
     button:hover {
-      background: #42a5f5;
+      background: #ffffff;
+      color: #f5c242;
     }
   </style>
 </head>
 <body>
   <h1>Draw. Fight. Repeat.</h1>
+  <p class="mystical-text">Each time you draw, destiny twists. Should effects clash, your last card insists.</p>
   <div class="deck-container" id="deckContainer"></div>
+  <p class="deck-message">Click a card to reveal it...</p>
   <div>
     <button onclick="shuffleDeck()">Shuffle Deck</button>
   </div>
@@ -158,7 +187,7 @@
       "You must drink in-game alcohol after every kill.", //THE DRUNKARD
       "You must travel on foot only. No teleports.", //THE PILGRIM
       "Every kill, you must swap to a new weapon.", //THE SWITCHEROO
-      "Your most valuable drop goes to your opponent at the end.", //THE UNLUCKY ONE,
+      "Your most valuable drop goes to your opponent at the end.", //THE UNLUCKY ONE
       "Regularly message your opponent compliments.", //THE LOVER
       "You must always eat up to max health.", //THE GLUTTON
       "You cannot heal above 50% health.", //THE FRAGILE
@@ -179,9 +208,6 @@
       "Any budget restrictions are removed.", //THE MERCHANT
       "Your opponent must give you their most valuable drop at the end.", //THE LUCKY ONE
       "You may declare one combat style that your opponent cannot use." //THE CHOSEN
-
-
-
     ];
 
     const cardFrontImages = {
@@ -246,7 +272,7 @@
       front.style.backgroundImage = `url('${cardBackImage}')`;
       const frontText = document.createElement('div');
       frontText.className = 'card-text';
-      frontText.textContent = "Click to reveal";
+      //frontText.textContent = "Click to reveal";
       front.appendChild(frontText);
 
       // BACK
@@ -345,6 +371,7 @@
   </script>
 </body>
 </html>
+
 
 
 
