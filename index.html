@@ -152,6 +152,22 @@
       background: #ffffff;
       color: #f5c242;
     }
+
+    @keyframes shuffle {
+      0%   { transform: translateX(0) rotate(0deg); z-index: 1; }
+      25%  { transform: translateX(-100px) rotate(-15deg); z-index: 2; }
+      50%  { transform: translateX(100px) rotate(15deg); z-index: 2; }
+      75%  { transform: translateX(-50px) rotate(-10deg); z-index: 2; }
+      100% { transform: translateX(0) rotate(0deg); z-index: 1; }
+    }
+
+    .card.shuffling {
+      animation: shuffle 0.6s ease-in-out;
+    }
+
+    .deck-container.disabled {
+      pointer-events: none;
+      }
   </style>
 </head>
 <body>
@@ -364,14 +380,44 @@
     function shuffleDeck() {
       const shuffled = [...cards].sort(() => Math.random() - 0.5);
       const selected = shuffled.slice(0, 5);
-      renderDeck(selected);
+
+      const cardElements = document.querySelectorAll('.card');
+
+      if (cardElements.length === 0) {
+        renderDeck(selected);
+        return;
+      }
+
+      // Disable clicks during shuffle
+      deckContainer.classList.add('disabled');
+
+      // Force all cards back face-down
+      cardElements.forEach(card => {
+        card.classList.remove('flipped');
+      });
+
+      // Animate each card
+      cardElements.forEach((card, i) => {
+        setTimeout(() => {
+          card.classList.add('shuffling');
+          card.addEventListener('animationend', () => {
+            card.classList.remove('shuffling');
+
+            if (i === cardElements.length - 1) {
+              renderDeck(selected);
+              // Re-enable clicks after new deck is rendered
+              deckContainer.classList.remove('disabled');
+            }
+          }, { once: true });
+        }, i * 150);
+      });
     }
+
 
     shuffleDeck();
   </script>
 </body>
 </html>
-
 
 
 
